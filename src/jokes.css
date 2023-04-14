@@ -1,0 +1,45 @@
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,100,900);
+* {
+  -moz-box-sizing: inherit;
+  box-sizing: inherit;
+  -webkit-transition-property: all;
+  transition-property: all;
+  -webkit-transition-duration: 0.6s;
+  transition-duration: 0.6s;
+  -webkit-transition-timing-function: ease;
+  transition-timing-function: ease;
+}
+
+html,
+body {
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  background: #a1e94e;
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+}
+.generateJokeButton {
+  background: #3498db;
+  border: 1px solid white;
+  box-shadow: 0px 2px 0 white, 4px 10px 8px #eee;
+  font-weight: 900;
+  letter-spacing: 1px;
+  -webkit-transition: all 150ms linear;
+  transition: all 150ms linear;
+}
+
+.generateJokeButton:hover {
+  background: #6894b1;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 1px 1px 2px rgba(255, 255, 255, 0.2);
+  color: #74e6e0;
+  text-decoration: none;
+  text-shadow: -1px -1px 0 #136a65;
+  -webkit-transition: all 250ms linear;
+  transition: all 250ms linear;
+}
