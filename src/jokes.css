@@ -134,3 +134,26 @@ th{
   cursor: pointer;
 }
 
+
+td {
+  width: 100%;
+  text-align: center;
+  border: 1px solid black !important;
+  padding: 15px ;
+  width: max-content;
+  color: whitesmoke;
+
+}
+
+tr:nth-child(even) {background-color: #7395AE;}
+
+
+tr:nth-child(odd) {background-color: #557A95;}
+
+tbody {
+  border: 1px solid black;
+}
+.name{
+  background-color: rgb(84, 129, 168);
+
+}

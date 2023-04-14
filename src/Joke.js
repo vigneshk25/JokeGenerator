@@ -4,20 +4,19 @@ import "./jokes.css";
 
 const JokesTable = () => {
   const [jokes, setJokes] = useState([]);
-  const [localJokes, setLocalJokes] = useState([]);
-  const [newArr, setNewArr] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-
+  const [found, setFound] = useState(null);
+  const empty1 = useRef()
+  const empty2 = useRef();
   const fetchJokes = async () => {
     try {
       const response = await axios.get(
         "https://api.chucknorris.io/jokes/random"
       );
-
+      console.log('16: ', response.data.value)
       const updateJokes = [response.data.value, ...jokes];
-      setJokes(updateJokes);
-      const newUpdatedArr = [response.data.value, ...newArr];
-      setNewArr(newUpdatedArr);
+      setJokes(updateJokes.reverse());
+      store(response.data.value)
+
     } catch (error) {
       console.error(error);
     }
@@ -25,54 +24,56 @@ const JokesTable = () => {
 
  
   useEffect(() => {
-    window.localStorage.setItem("localJoke", JSON.stringify(localJokes));
-    window.localStorage.setItem("storeFechJoke", JSON.stringify(newArr));
-  },[]);
-  useEffect(() => {
-    const newLocal = window.localStorage.getItem("localJoke");
-    setLocalJokes(JSON.parse(newLocal));
+    const currentJokes = JSON.parse(window.localStorage.getItem('localJoke'))
 
-    const newFetch = window.localStorage.getItem("storeFechJoke");
-    setNewArr(JSON.parse(newFetch));
-  }, []);
+    if (!currentJokes) {
+      window.localStorage.setItem("localJoke", JSON.stringify([]));
+      setJokes(currentJokes && currentJokes.length > 0 ? currentJokes : []);
+    } else {
+      setJokes(currentJokes);
+    }
   
+  },[]);
+  
+  const store = (joke) => {
+    const currentJokes = JSON.parse(window.localStorage.getItem('localJoke')) || []
+    window.localStorage.setItem("localJoke", JSON.stringify([...currentJokes, joke]));
+  }
   const handleAddJoke = (joke) => {
-    setLocalJokes(localJokes.concat(joke));
-    empty.current.value= "";
+    if (joke === '') return;
+    setJokes([...jokes, joke]);
+    store(joke)
+    empty1.current.value= "";
   };
 
-  const handleNewJokes = async () => {
-    await fetchJokes();
-    
-  };
-  const filteredJokes = jokes
-    .concat(localJokes)
-    .filter((joke) => joke.toLowerCase().includes(searchTerm.toLowerCase()));
-  const newjokeArr = jokes
-    .concat(newArr)
-    .filter((joke) => joke.toLowerCase().includes(searchTerm.toLowerCase()));
-
-  const finArrFiltr = filteredJokes.reverse().map((joke) => {
-    return (
-      <tr key={joke}>
-        <td>{joke}</td>
-      </tr>
-    );
-  });
-  const finArrLoc = newjokeArr.reverse().map((joke) => {
-    return (
-      <tr key={joke}>
-        <td>{joke}</td>
-      </tr>
-    );
-  });
   const deleteLocalStorage = () => {
-    window.localStorage.clear();
-    setNewArr([]);
-    setLocalJokes([]);
+    setJokes([])
+    window.localStorage.setItem("localJoke", JSON.stringify([]));
   };
-
-  const empty = useRef()
+  const onSearch = (val) => {
+    const result = []
+    if (val !== '' || val.trim() !== '') {
+      for (let i = 0; i < jokes.length; i++) {
+        if (jokes[i].toLowerCase().includes(val)) {
+            result.push(jokes[i])
+        }
+      }
+    }
+    if (result.length > 0) {
+      setFound(result)
+    } else {
+      setFound(null);
+    }
+  }
+const renderItems = (items = []) => {
+  if (items === null) items = []
+  items = items.reverse();
+  return items.map((item, idx) => {
+    return (
+      <tr key = {idx}><td>{item}</td></tr>
+    )
+  })
+}
   return (
     <div>
       
@@ -80,7 +81,7 @@ const JokesTable = () => {
       <div className="ClearJoke"><button onClick={deleteLocalStorage} className="ClearAll" >Clear</button></div>  
 
         <h1>JOKE GENERATOR</h1>
-        <button onClick={handleNewJokes} className="generateJokeButton">
+        <button onClick={fetchJokes} className="generateJokeButton">
           Generate Jokes
         </button>
 
@@ -91,14 +92,17 @@ const JokesTable = () => {
             <input
               placeholder="Jokes"
               type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => onSearch(e.target.value)}
+              ref = {empty2}
             />
-            <button onClick={() => setSearchTerm("")}>Clear</button>
+            <button onClick={() => {
+                empty2.current.value = ''
+                setFound(null)
+            }}>Clear</button>
           </div>
 
           <div className="EnterJoke">
-            <input type="text" placeholder="Enter a joke" ref={empty} />
+            <input type="text" placeholder="Enter a joke" ref={empty1} />
             <button
               onClick={(e) => handleAddJoke(e.target.previousSibling.value)}>
               Add Joke
@@ -109,18 +113,21 @@ const JokesTable = () => {
         <table>
           <thead>
             <tr>
-              <th>Jokes</th>
+              <th className="name">Jokes</th>
             </tr>
           </thead>
-          <tbody>{finArrFiltr}</tbody>
+          <tbody>{found ? renderItems(found) : renderItems(jokes) }</tbody>
         </table>
-        <table>
+
+
+
+        {/* <table>
         <thead>
             <tr>
             </tr>
           </thead>
           <tbody>{finArrLoc}</tbody>
-        </table>
+        </table> */}
         
       </center>
     </div>
